@@ -45,9 +45,9 @@ def create_building():
 
 @app.route('/structures/api/v1/vehicles/<string:id>', methods=['PUT'])
 @auth.login_required
-def update_one_building(id):
-    building = get_vehicle(id)
-    if building is None or not request.json:
+def update_one_vehicle(id):
+    vehicle = get_vehicle(id)
+    if vehicle is None or not request.json:
         abort(404)
     if ('model_id' in request.json and
             type(request.json['model_id']) is not int):
@@ -59,10 +59,87 @@ def update_one_building(id):
     if 'electric_range' in request.json and type(request.json['electric_range']) is not int:
         abort(400)
 
-    building_update = update_vehicle(id, request.get_json())
+    vehicle_update = update_vehicle(id, request.get_json())
 
-    return jsonify({'building': vehicle_schema.dump(building_update)})
+    return jsonify({'vehicle': vehicle_schema.dump(vehicle_update)})
 
+@app.route('/structures/api/v1/vehicles/year', methods=['GET'])
+@auth.login_required
+def vehicles_by_year_range():
+    from_year = request.args.get('from_year')
+    to_year = request.args.get('to_year')
+    vehicles = get_vehicle_by_year_range(from_year, to_year)
+    return jsonify({
+        "vehicles":  vehicles_schema.dump(vehicles)
+    }), 200
+
+@app.route('/structures/api/v1/vehicles/maker', methods=['GET'])
+@auth.login_required
+def vehicles_by_maker():
+    vehicles = get_vehicle_electric_range_by_make()
+    data = [
+        {
+            "maker": row[0],
+            "max_range": row[1],
+            "min_range": row[2],
+            "avg_range": float(row[3]) if row[3] is not None else None
+        }
+        for row in vehicles
+    ]
+    return jsonify({
+        "data": data
+    }), 200
+
+@app.route('/structures/api/v1/vehicles/city', methods=['GET'])
+@auth.login_required
+def vehicles_by_city():
+    vehicles = get_vehicle_by_city()
+    data = [
+        {
+            "city": row[0],
+            "max_range": row[1],
+            "min_range": row[2],
+            "avg_range": float(row[3]) if row[3] is not None else None
+        }
+        for row in vehicles
+    ]
+    return jsonify({
+        "data": data
+    }), 200
+
+@app.route('/structures/api/v1/vehicles/model', methods=['GET'])
+@auth.login_required
+def vehicles_by_model():
+    vehicles = get_vehicle_electric_range_by_model()
+    data = [
+        {
+            "model": row[0],
+            "max_range": row[1],
+            "min_range": row[2],
+            "avg_range": float(row[3]) if row[3] is not None else None
+        }
+        for row in vehicles
+    ]
+    return jsonify({
+        "data": data
+    }), 200
+
+@app.route('/structures/api/v1/vehicles/country', methods=['GET'])
+@auth.login_required
+def vehicles_by_country():
+    vehicles = get_vehicle_by_country()
+    data = [
+        {
+            "country": row[0],
+            "max_range": row[1],
+            "min_range": row[2],
+            "avg_range": float(row[3]) if row[3] is not None else None
+        }
+        for row in vehicles
+    ]
+    return jsonify({
+        "data": data
+    }), 200
 
 @app.route('/structures/api/v1/vehicles/<string:id>', methods=['DELETE'])
 @auth.login_required

@@ -1,6 +1,7 @@
 from config import db
-from models import Country, City, Vehicle, Make
+from models import Country, City, Vehicle, Make, Model
 from structures.serializers import vehicle_schema, vehicles_schema
+from sqlalchemy import func
 from uuid import uuid4
 
 def get_all_vehicles():
@@ -13,6 +14,66 @@ def get_vehicle(building_id):
     query = Vehicle.query.filter(Vehicle.id == building_id).one_or_none()
     return query
 
+def get_vehicle_electric_range_by_model():
+    query = (
+        db.session.query(
+            Model.name.label("Модель"),
+            func.max(Vehicle.electric_range).label("Максимальный запас хода"),
+            func.min(Vehicle.electric_range).label("Минимальный запас хода"),
+            func.avg(Vehicle.electric_range).label("Средний запас хода")
+        )
+        .select_from(Vehicle)
+        .join(Model)
+        .group_by(Model.name)
+    )
+    return query.all()
+
+def get_vehicle_electric_range_by_make():
+    query = (
+        db.session.query(
+            Make.name.label("Производитель"),
+            func.max(Vehicle.electric_range).label("Максимальный запас хода"),
+            func.min(Vehicle.electric_range).label("Минимальный запас хода"),
+            func.avg(Vehicle.electric_range).label("Средний запас хода")
+        )
+        .select_from(Vehicle)
+        .join(Model)
+        .join(Make)
+        .group_by(Make.name)
+    )
+    return query.all()
+
+def get_vehicle_by_year_range(from_year, to_year):
+    return Vehicle.query.filter(Vehicle.model_year.between(from_year, to_year)).all()
+
+def get_vehicle_by_city():
+    query = (
+        db.session.query(
+            City.name.label("Город"),
+            func.max(Vehicle.electric_range).label("Максимальный запас хода"),
+            func.min(Vehicle.electric_range).label("Минимальный запас хода"),
+            func.avg(Vehicle.electric_range).label("Средний запас хода")
+        )
+        .select_from(Vehicle)
+        .join(City)
+        .group_by(City.name)
+    )
+    return query.all()
+
+def get_vehicle_by_country():
+    query = (
+        db.session.query(
+            Country.name.label("Страна"),
+            func.max(Vehicle.electric_range).label("Максимальный запас хода"),
+            func.min(Vehicle.electric_range).label("Минимальный запас хода"),
+            func.avg(Vehicle.electric_range).label("Средний запас хода")
+        )
+        .select_from(Vehicle)
+        .join(City)
+        .join(Country)
+        .group_by(Country.name)
+    )
+    return query.all()
 
 def insert_vehicle(vehicle):
     vehicle_id = str(uuid4())[:17]
