@@ -6,7 +6,6 @@ from uuid import uuid4
 
 def get_all_vehicles():
     query = Vehicle.query.all()
-
     return query
 
 
@@ -94,7 +93,7 @@ def update_vehicle(id, data):
     if 'model_id' in data:
         if not isinstance(data['model_id'], int):
             raise ValueError("model_id must be an integer")
-        if not Make.query.get(data['model_id']):
+        if not Model.query.get(data['model_id']):
             raise ValueError("Invalid model_id")
     if 'city_id' in data:
         if not isinstance(data['city_id'], int):

@@ -5,24 +5,24 @@ from structures.serializers import vehicles_schema, vehicle_schema
 
 @app.route('/structures/api/v1/vehicles', methods=['GET'])
 @auth.login_required
-def get_buildings():
-    buildings = get_all_vehicles()
+def get_vehicles():
+    vehicles = get_all_vehicles()
 
-    return jsonify({"vehicles": vehicles_schema.dump(buildings)})
+    return jsonify({"vehicles": vehicles_schema.dump(vehicles)})
 
 
-@app.route('/structures/api/v1/vehicles/<string:id>', methods=['GET'])
+@app.route('/structures/api/v1/vehicles/<string:vehicle_id>', methods=['GET'])
 @auth.login_required
-def get_one_building(id):
-    building = get_vehicle(id)
-    if building is None:
+def get_one_vehicle(vehicle_id):
+    vehicle = get_vehicle(vehicle_id)
+    if vehicle is None:
         abort(404)
-    return jsonify({"vehicle": vehicle_schema.dump(building)})
+    return jsonify({"vehicle": vehicle_schema.dump(vehicle)})
 
 
 @app.route('/structures/api/v1/vehicles', methods=['POST'])
 @auth.login_required
-def create_building():
+def create_vehicle():
 
     if (not request.json
             or 'model_id' not in request.json

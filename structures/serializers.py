@@ -1,6 +1,6 @@
 from models import Vehicle, Make, Country, City
 from config import ma, db
-
+from flask import url_for
 
 class MakeSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -24,10 +24,14 @@ class VehicleSchema(ma.SQLAlchemyAutoSchema):
         model = Vehicle
         load_instance = True
         sqla_session = db.session
+        include_fk = True
 
-    model_id = ma.auto_field()
-    city_id = ma.auto_field()
+    city = ma.Nested(CitySchema)
+    model = ma.Nested(MakeSchema)
 
+    self = ma.Hyperlinks({
+        'self': ma.URLFor('get_one_vehicle', values={'vehicle_id': '<id>'})
+    })
 
 vehicle_schema = VehicleSchema()
 vehicles_schema = VehicleSchema(many=True)
