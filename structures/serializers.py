@@ -27,7 +27,7 @@ class VehicleSchema(ma.SQLAlchemyAutoSchema):
 
     city = ma.Nested(CitySchema)
     model = ma.Nested(MakeSchema)
-
+    
     self = ma.Hyperlinks(
         ma.URLFor('get_one_vehicle', values={'vehicle_id': '<id>'})
     )

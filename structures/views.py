@@ -3,6 +3,7 @@ from flask import jsonify, abort, make_response, request
 from structures.models import *
 from structures.serializers import vehicles_schema, vehicle_schema
 
+
 @app.route('/structures/api/v1/vehicles', methods=['GET'])
 @auth.login_required
 def get_vehicles():
@@ -23,7 +24,6 @@ def get_one_vehicle(vehicle_id):
 @app.route('/structures/api/v1/vehicles', methods=['POST'])
 @auth.login_required
 def create_vehicle():
-
     if (not request.json
             or 'model_id' not in request.json
             or 'city_id' not in request.json):
@@ -63,15 +63,35 @@ def update_one_vehicle(id):
 
     return jsonify({'vehicle': vehicle_schema.dump(vehicle_update)})
 
-@app.route('/structures/api/v1/vehicles/year', methods=['GET'])
+
+@app.route('/structures/api/v1/vehicles/year/range', methods=['GET'])
 @auth.login_required
 def vehicles_by_year_range():
     from_year = request.args.get('from_year')
     to_year = request.args.get('to_year')
     vehicles = get_vehicle_by_year_range(from_year, to_year)
     return jsonify({
-        "vehicles":  vehicles_schema.dump(vehicles)
+        "vehicles": vehicles_schema.dump(vehicles)
     }), 200
+
+
+@app.route('/structures/api/v1/vehicles/year', methods=['GET'])
+@auth.login_required
+def vehicles_by_year():
+    vehicles = get_vehicle_by_year()
+    data = [
+        {
+            "Группа": row[0],
+            "Максимальный запас хода": row[1],
+            "Минимальный запас хода": row[2],
+            "Средний запас хода": float(row[3]) if row[3] is not None else None
+        }
+        for row in vehicles
+    ]
+    return jsonify({
+        "data": data
+    }), 200
+
 
 @app.route('/structures/api/v1/vehicles/maker', methods=['GET'])
 @auth.login_required
@@ -79,16 +99,17 @@ def vehicles_by_maker():
     vehicles = get_vehicle_electric_range_by_make()
     data = [
         {
-            "maker": row[0],
-            "max_range": row[1],
-            "min_range": row[2],
-            "avg_range": float(row[3]) if row[3] is not None else None
+            "Группа": row[0],
+            "Максимальный запас хода": row[1],
+            "Минимальный запас хода": row[2],
+            "Средний запас хода": float(row[3]) if row[3] is not None else None
         }
         for row in vehicles
     ]
     return jsonify({
         "data": data
     }), 200
+
 
 @app.route('/structures/api/v1/vehicles/city', methods=['GET'])
 @auth.login_required
@@ -96,16 +117,17 @@ def vehicles_by_city():
     vehicles = get_vehicle_by_city()
     data = [
         {
-            "city": row[0],
-            "max_range": row[1],
-            "min_range": row[2],
-            "avg_range": float(row[3]) if row[3] is not None else None
+            "Группа": row[0],
+            "Максимальный запас хода": row[1],
+            "Минимальный запас хода": row[2],
+            "Средний запас хода": float(row[3]) if row[3] is not None else None
         }
         for row in vehicles
     ]
     return jsonify({
         "data": data
     }), 200
+
 
 @app.route('/structures/api/v1/vehicles/model', methods=['GET'])
 @auth.login_required
@@ -113,10 +135,10 @@ def vehicles_by_model():
     vehicles = get_vehicle_electric_range_by_model()
     data = [
         {
-            "model": row[0],
-            "max_range": row[1],
-            "min_range": row[2],
-            "avg_range": float(row[3]) if row[3] is not None else None
+            "Группа": row[0],
+            "Максимальный запас хода": row[1],
+            "Минимальный запас хода": row[2],
+            "Средний запас хода": float(row[3]) if row[3] is not None else None
         }
         for row in vehicles
     ]
@@ -124,22 +146,24 @@ def vehicles_by_model():
         "data": data
     }), 200
 
+
 @app.route('/structures/api/v1/vehicles/country', methods=['GET'])
 @auth.login_required
 def vehicles_by_country():
     vehicles = get_vehicle_by_country()
     data = [
         {
-            "country": row[0],
-            "max_range": row[1],
-            "min_range": row[2],
-            "avg_range": float(row[3]) if row[3] is not None else None
+            "Группа": row[0],
+            "Максимальный запас хода": row[1],
+            "Минимальный запас хода": row[2],
+            "Средний запас хода": float(row[3]) if row[3] is not None else None
         }
         for row in vehicles
     ]
     return jsonify({
         "data": data
     }), 200
+
 
 @app.route('/structures/api/v1/vehicles/<string:id>', methods=['DELETE'])
 @auth.login_required

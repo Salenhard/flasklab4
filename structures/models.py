@@ -45,6 +45,19 @@ def get_vehicle_electric_range_by_make():
 def get_vehicle_by_year_range(from_year, to_year):
     return Vehicle.query.filter(Vehicle.model_year.between(from_year, to_year)).all()
 
+def get_vehicle_by_year():
+    query = (
+        db.session.query(
+            Vehicle.model_year.label("Запас хода"),
+            func.max(Vehicle.electric_range).label("Максимальный запас хода"),
+            func.min(Vehicle.electric_range).label("Минимальный запас хода"),
+            func.avg(Vehicle.electric_range).label("Средний запас хода")
+        )
+        .select_from(Vehicle)
+        .group_by(Vehicle.model_year)
+    )
+    return query.all()
+
 def get_vehicle_by_city():
     query = (
         db.session.query(
